@@ -96,6 +96,19 @@ while tuple_trans:
     print()   
     tuple_trans = input("Ingrese par Estado, Simbolo (Termina si no ingresa nada): ")
     
+print()
+pal = input("Ingrese la palabra a revisar: ")
+estado_actual = init_state
+for i in pal:
+    if (estado_actual, i) in transitions.keys(): #revisa si existe una transición
+        estado_actual = transitions[(estado_actual, i)]
+    else:
+        print("Palabra no aceptada")
+        break
+if estado_actual in accept_states:
+    print("Palabra aceptada")
+else:
+    print("Palabra no aceptada")    
 
 
  
