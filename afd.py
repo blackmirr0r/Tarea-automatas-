@@ -85,7 +85,7 @@ transitions = {} # diccionario de la forma (estado, simbolo): estado llegada
 #string estado, simbolo que luego será tupla 
 tupla = input("Ingrese par Estado, Simbolo (Termina si no ingresa nada): ")
 
-while tupla:}
+while tupla:
     #arreglo de string tupla para eliminar caracteres indeseados
     arr_tupla = [i.strip() for i in tupla.split(',') if i] 
     
