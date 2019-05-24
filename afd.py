@@ -103,9 +103,16 @@ while tupla:
     while arrive_state not in states:
         print("Estado invalido")
         arrive_state = input("Ingrese Estado de llegada: ")
+    
 
-    #agregar clave - valor al diccionario 
-    transitions[tuple(arr_tupla)] = arrive_state 
+    #verifica que no sea AFND
+    if tuple(arr_tupla) in transitions.keys():
+        option = input("\nEstado ya lleva esa transición a otro estado... Desea reemplazarla? (S | N): ")
+        if option in ('S','s'):
+            transitions[tuple(arr_tupla)] = arrive_state
+    
+    else:
+        transitions[tuple(arr_tupla)] = arrive_state
     print(transitions)
     print()   
     tupla = input("Ingrese par Estado, Simbolo (Termina si no ingresa nada): ")
@@ -134,13 +141,14 @@ if word_accepted:
     for i in pal:
         if (estado_actual, i) in transitions.keys(): #revisa si existe una transición
             estado_actual = transitions[(estado_actual, i)]
-        else:
-            print("Palabra no aceptada")
-            break
+
+        else: break
     
     if estado_actual in accept_states:
         print("Palabra aceptada")
-    
+    else:
+        print("Palabra no aceptada")
+        
 else:
     #funcion para filtrar elementos que no estan en alfabeto
     not_alphabet = notInAlphabetSymbols(pal, alphabet)
