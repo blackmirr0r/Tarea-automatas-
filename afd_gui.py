@@ -6,7 +6,7 @@ from tkinter import ttk, font, messagebox
 
 import sys
 
-class Aplicacion():
+class Window():
     def __init__(self): 
         self.window = Tk()
         self.states = []  
@@ -19,55 +19,46 @@ class Aplicacion():
         self.fuente = font.Font(weight='bold')
         self.frame = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120))
         self.etiq_state = ttk.Label(self.frame, text="Ingrese estado: ", font=self.fuente, padding=(5,5))
-        self.etiq_msj = ttk.Label(self.frame, text="", font=self.fuente, padding=(1,3))
         self.state = StringVar()
         self.input_state = ttk.Entry(self.frame, textvariable=self.state, width=30)
-        self.separator = ttk.Separator(self.frame, orient=HORIZONTAL)
-        self.input_state.bind('<Return>', self.statesValid)
         self.boton1 = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command = self.statesValid)
         self.WindowConf()
         self.window.mainloop()
 
     #Estado inicial
-    def initialStateFrame(self, event):
+    def initialStateFrame(self):
         self.etiq_state.destroy
         self.boton1.destroy
-        self.etiq_msj.destroy
         self.etiq_state = ttk.Label(self.frame, text="Ingrese estado inicial", font=self.fuente, padding=(5,5))
-        self.etiq_msj = ttk.Label(self.frame, text="", font=self.fuente, padding=(1,3))
-        self.input_state.bind('<Return>', self.initialStateValid)
         self.boton1 = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command = self.initialStateValid)
         self.window.title("Estado inicial")
         self.WindowConf()
 
     #Estados finales    
-    def finalStatesFrame(self, event):
+    def finalStatesFrame(self):
         self.state.set("") 
         self.etiq_state.destroy
         self.boton1.destroy
         self.etiq_state = ttk.Label(self.frame, text="Ingrese estado final", font=self.fuente, padding=(5,5))
-        self.input_state.bind('<Return>', self.finalStatesValid)
         self.boton1 = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command=self.finalStatesValid)
         self.window.title("Estados finales")
         self.WindowConf()
     
     #Transiciones
-    def transitionsFrame(self, event):
+    def transitionsFrame(self):
         self.state.set("") 
         self.etiq_state.destroy
         self.boton1.destroy
         self.etiq_state = ttk.Label(self.frame, text="Ingrese transición Estado, Simbolo: ", font=self.fuente, padding=(5,5))
-        self.input_state.bind('<Return>', self.validTransitions)
         self.boton1 = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command=self.validTransitions)
         self.window.title("Transiciones")
         self.WindowConf()
     
-    def arriveStateFrame(self, event):
+    def arriveStateFrame(self):
         self.state.set("")
         self.etiq_state.destroy
         self.boton1.destroy
         self.etiq_state = ttk.Label(self.frame, text = "Ingrese Estado de llegada: ",  font=self.fuente, padding=(5,5))
-        self.input_state.bind('<Return>', self.arriveStateValid)
         self.boton1 = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command=self.arriveStateValid)
         self.window.title("Estado de llegada")
         self.WindowConf()
@@ -76,13 +67,12 @@ class Aplicacion():
     def WindowConf(self): 
         self.frame.grid(column=0, row=0)
         self.etiq_state.grid(column=0, row=1, columnspan = 1)
-        self.etiq_msj.grid(column=0, row=2, columnspan = 1, pady = 15) 
         self.input_state.grid(column=0, row=3, pady = 10)
         self.boton1.grid(column=0, row=9, pady = 15) 
         self.input_state.focus_set()
     
     
-    def arriveStateValid(self, event):
+    def arriveStateValid(self):
         state = self.state
         if state.get() not in self.states:
             messagebox.showerror("Error", "Estado de llegada invalido")
@@ -102,31 +92,31 @@ class Aplicacion():
                 self.transitions[tuple(self.arr_tupla)] = self.arrive_state
                 print(self.transitions)
             
-            self.transitionsFrame(event)
+            self.transitionsFrame()
 
-    def validTransitions(self, event):
+    def validTransitions(self):
         tupla = self.state.get()
         if tupla:
             self.arr_tupla = [i.strip() for i in tupla.split(',') if i]
-            if len(self.arr_tupla) != 2 or self.arr_tupla[0] not in self.states or self.arr_tupla[1] in self.states:
+            if len(self.arr_tupla) != 2 or      self.arr_tupla[0] not in self.states or self.arr_tupla[1] in self.states:
                 messagebox.showerror("Error", "Transición invalida")
                 self.state.set("")
                 self.input_state.focus_set()
     
             else:
-                self.arriveStateFrame(event)
+                self.arriveStateFrame()
                 
         else:
-            print("NUEVA VENTANA")    
+            print("NUEVA VENTANA    ")    
 
-    def finalStatesValid(self, event):
+    def finalStatesValid(self):
         state = self.state.get()
         if (state in self.states) and (state not in self.final_states): 
             self.final_states.append(state)
             print(self.final_states)
         else:
             if state == '' and len(self.final_states) > 0:
-                return self.transitionsFrame(event)
+                return self.transitionsFrame()
             
             messagebox.showerror("Error", "Estado final invalido")
         
@@ -134,7 +124,7 @@ class Aplicacion():
         self.input_state.focus_set()
 
     
-    def initialStateValid(self, event):
+    def initialStateValid(self):
         state = self.state
         if state.get() not in self.states:
             messagebox.showerror("Error", "Estado inicial invalido")
@@ -144,12 +134,12 @@ class Aplicacion():
         
         else:
             self.initial_state = state.get() 
-            self.finalStatesFrame(event)
+            self.finalStatesFrame()
             
         
 
     
-    def statesValid(self, event):
+    def statesValid(self):
         state = self.state
         if state.get() and not state.get().isspace():  #Validar ingreso  
             if state.get() in self.states:
@@ -159,7 +149,7 @@ class Aplicacion():
 
             print(self.states)
         else:
-            self.initialStateFrame(event) 
+            self.initialStateFrame() 
             
         state.set("")
         self.input_state.focus_set()
@@ -167,9 +157,7 @@ class Aplicacion():
      
 
 def main():
-      
-    mi_app = Aplicacion()
-    return 0
+    window = Window()
 
 if __name__ == '__main__':
     main()

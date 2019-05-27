@@ -127,31 +127,30 @@ print()
 #construir alfabeto en base a simbolos ingresados en transiciones
 alphabet = [symbol[1] for symbol in transitions.keys()]
 
-pal = input("Ingrese la palabra a revisar: ")
-
-#NO SE SI SE PUEDE INGRESAR NADA PERO SI SE PUEDE COMENTEN EL WHILE
-while not(pal):
+while True:
     pal = input("Ingrese la palabra a revisar: ")
-
-estado_actual = init_state 
-#revisa si cada simbolo de la palabra existe en alfabeto
-word_accepted = all(elem in alphabet for elem in set(pal)) 
-
-if word_accepted:
-    for i in pal:
-        if (estado_actual, i) in transitions.keys(): #revisa si existe una transición
-            estado_actual = transitions[(estado_actual, i)]
-
-        else: break
+    print(list(pal))
+    estado_actual = init_state 
+    #revisa si cada simbolo de la palabra existe en alfabeto
+    word_accepted = all(elem in alphabet for elem in set(pal)) 
     
-    if estado_actual in accept_states:
-        print("Palabra aceptada")
-    else:
-        print("Palabra no aceptada")
+    if word_accepted:
+        for index, symbol in enumerate(pal):
+            if (estado_actual, symbol) in transitions.keys(): #revisa si existe una transición
+                estado_actual = transitions[(estado_actual, symbol)]
+                
+            else: 
+                break               
         
-else:
-    #funcion para filtrar elementos que no estan en alfabeto
-    not_alphabet = notInAlphabetSymbols(pal, alphabet)
-    print("Palabra no aceptada ya que los simbolos ( "+ not_alphabet+" ) no existen en el alfabeto del AFD")
- 
+        
+        if estado_actual in accept_states and (index + 1) == len(pal):
+            print("Palabra aceptada")
+        else:
+            print("Palabra no aceptada")
+            
+    else:
+        #funcion para filtrar elementos que no estan en alfabeto
+        not_alphabet = notInAlphabetSymbols(pal, alphabet)
+        print("Palabra no aceptada ya que los simbolos ( "+ not_alphabet+" ) no existen en el alfabeto del AFD")
+    
   
