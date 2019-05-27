@@ -6,7 +6,7 @@ Antes de compilar codigo es necesario instalar Tkinter para Linux
 
 En Debian: 
 
-<code> sudo apt-get install python3-tk </code> 
+<code> sudo apt install python3-tk </code> 
 
 En Fedora: 
 
