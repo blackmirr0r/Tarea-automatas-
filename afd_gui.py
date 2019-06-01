@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 from tkinter import *
 from tkinter import ttk, font, messagebox
-
 import sys
 
 class Window():
@@ -13,117 +11,184 @@ class Window():
         self.initial_state = ''
         self.final_states = []
         self.transitions = {}
-        self.arrive_state = ''
-        self.window.title("Estados")
+        self.colours =['#A500FD','#101010']
+        self.style = ttk.Style()
+        self.style.configure('colorFondo.TFrame', background='#000000')
+        self.style.configure('colorAceptado.TFrame', background='#49F52B', foreground='#FFFFFF')
+        self.style.configure('colorRechazado.TFrame', background='#F41212', foreground='#FFFFFF')  #49F52B
+        self.style.configure('color.TLabel', background='#000000', foreground='#FFFFFF')
+        self.style.configure('labelAceptado.TLabel', background='#49F52B', foreground='#000000')
+        self.style.configure('labelRechazado.TLabel', background='#F41212', foreground='#000000')
+        self.window.title("Transiciones")
         self.window.resizable(0,0)
         self.fuente = font.Font(weight='bold')
-        self.frame = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120))
-        self.etiq_state = ttk.Label(self.frame, text="Ingrese estado: ", font=self.fuente, padding=(5,5))
+        self.frame = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120), style='colorFondo.TFrame')
+        self.etiq_state = ttk.Label(self.frame, text="Ingrese transición de la forma (estado actual, simbolo, estado llegada):", font=self.fuente, padding=(5,5), style='color.TLabel')
         self.state = StringVar()
         self.input_state = ttk.Entry(self.frame, textvariable=self.state, width=30)
-        self.boton1 = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command = self.statesValid)
-        self.WindowConf()
+        self.boton = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command = self.validTransitions)
+        self.WindowConf(self.frame)
         self.window.mainloop()
 
+    
     #Estado inicial
     def initialStateFrame(self):
-        self.etiq_state.destroy
-        self.boton1.destroy
-        self.etiq_state = ttk.Label(self.frame, text="Ingrese estado inicial", font=self.fuente, padding=(5,5))
-        self.boton1 = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command = self.initialStateValid)
+        self.frame.destroy()
+        self.frameInitialState = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120),style='colorFondo.TFrame' )
+        self.etiq_state = ttk.Label(self.frameInitialState, text="Ingrese estado inicial", font=self.fuente, padding=(5,5), style='color.TLabel')
+        self.boton = ttk.Button(self.frameInitialState, text="Aceptar", padding=(5,5), command = self.initialStateValid)
+        self.input_state = ttk.Entry(self.frameInitialState, textvariable=self.state, width=30)
         self.window.title("Estado inicial")
-        self.WindowConf()
-
+        self.WindowConf(self.frameInitialState)
+    
+    
     #Estados finales    
     def finalStatesFrame(self):
-        self.state.set("") 
-        self.etiq_state.destroy
-        self.boton1.destroy
-        self.etiq_state = ttk.Label(self.frame, text="Ingrese estado final", font=self.fuente, padding=(5,5))
-        self.boton1 = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command=self.finalStatesValid)
-        self.window.title("Estados finales")
-        self.WindowConf()
+        self.frameInitialState.destroy()
+        self.frameFinalState = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120), style='colorFondo.TFrame')
+        self.etiq_state = ttk.Label(self.frameFinalState, text="Ingrese estado final:", font=self.fuente, padding=(5,5), style='color.TLabel')
+        self.boton = ttk.Button(self.frameFinalState, text="Aceptar", padding=(5,5), command = self.finalStatesValid)
+        self.input_state = ttk.Entry(self.frameFinalState, textvariable=self.state, width=30)
+        self.window.title("Estado inicial")
+        self.WindowConf(self.frameFinalState)
     
-    #Transiciones
-    def transitionsFrame(self):
-        self.state.set("") 
-        self.etiq_state.destroy
-        self.boton1.destroy
-        self.etiq_state = ttk.Label(self.frame, text="Ingrese transición Estado, Simbolo: ", font=self.fuente, padding=(5,5))
-        self.boton1 = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command=self.validTransitions)
-        self.window.title("Transiciones")
-        self.WindowConf()
     
-    def arriveStateFrame(self):
-        self.state.set("")
-        self.etiq_state.destroy
-        self.boton1.destroy
-        self.etiq_state = ttk.Label(self.frame, text = "Ingrese Estado de llegada: ",  font=self.fuente, padding=(5,5))
-        self.boton1 = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command=self.arriveStateValid)
-        self.window.title("Estado de llegada")
-        self.WindowConf()
+    def wordAcceptedFrame(self):
+        self.frameFinalState.destroy()
+        self.frameWordAccepted = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120), style='colorFondo.TFrame')
+        self.etiq_transition = ttk.Label(self.frameWordAccepted, text="Transiciones", font=self.fuente, style='color.TLabel')
+        self.item1 = StringVar()
+        self.item2 = StringVar()
+        self.item3 = StringVar()
+        for item in self.transitions.keys(): 
+            self.item1.set(item[0])
+            self.item2.set(item[1])
+            self.item3.set(self.transitions[item])
+        self.boxText = ttk.Label(self.frameWordAccepted, text=('δ('+self.item1.get()+','+self.item2.get()+') = '+self.item3.get()))
+        self.etiq_state = ttk.Label(self.frameWordAccepted, text="Ingrese palabra:", font=self.fuente,  style ='color.TLabel')
+        self.boton = ttk.Button(self.frameWordAccepted, text="Verificar", command = self.verificateWord)
+        self.input_state = ttk.Entry(self.frameWordAccepted, textvariable=self.state, width=30)
+        self.wordWindow(self.frameWordAccepted)
+
+    def acceptedWindow(self):
+        self.frameWordAccepted.destroy()
+        self.acceptedFrame = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120), style ='colorAceptado.TFrame')
+        self.etiq_state = ttk.Label(self.acceptedFrame, text="Palabra aceptada!", font=self.fuente, padding=(5,5), style ='labelAceptado.TLabel')
+        self.windowConf2(self.acceptedFrame)
     
-    #configurando posiciones de la ventana y sus componentes
-    def WindowConf(self): 
-        self.frame.grid(column=0, row=0)
+    def rejectedWindow(self):
+        self.frameWordAccepted.destroy()
+        self.rejectedFrame = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120), style ='colorRechazado.TFrame')
+        self.etiq_state = ttk.Label(self.rejectedFrame, text="Palabra Rechazada!", font=self.fuente, padding=(5,5), style ='labelRechazado.TLabel')
+        self.windowConf2(self.rejectedFrame)
+    
+    def windowConf2(self, frame):
+        frame.grid(column=0, row=0)
         self.etiq_state.grid(column=0, row=1, columnspan = 1)
-        self.input_state.grid(column=0, row=3, pady = 10)
-        self.boton1.grid(column=0, row=9, pady = 15) 
-        self.input_state.focus_set()
-    
-    
-    def arriveStateValid(self):
+        
+    def verificateWord(self):
+        self.flag = True
         state = self.state
-        if state.get() not in self.states:
-            messagebox.showerror("Error", "Estado de llegada invalido")
-            state.set("")
-            self.input_state.focus_set()
-    
+        self.estado_actual = self.initial_state 
+        
+        #revisa si cada simbolo de la palabra existe en alfabeto
+        self.word_accepted = all(elem in self.alphabet for elem in set(state.get())) 
+        
+        if not(state.get()):
+            self.acceptedWindow() if self.estado_actual in self.final_states else self.rejectedWindow()
+        
         else:
-            if tuple(self.arr_tupla) in self.transitions.keys():
-                askbox = messagebox.askquestion('Reemplazo transición','Estado ya lleva esa transición a otro estado, Desea reemplazarla?',icon = 'warning')
-                if askbox == 'yes':
-                    self.arrive_state = state.get()
-                    self.transitions[tuple(self.arr_tupla)] = self.arrive_state
-                    print(self.transitions)
+            if self.word_accepted:
+                for symbol in state.get():
+                    if (self.estado_actual, symbol) in self.transitions.keys(): #revisa si existe una transición
+                        self.estado_actual = self.transitions[(self.estado_actual, symbol)]
+                        
+                    else:
+                        self.flag = False  
+                        break               
+            
+            
+                if self.flag and self.estado_actual in self.final_states:
+                    self.acceptedWindow()
+                
+                else:
+                    self.rejectedWindow()
                 
             else:
-                self.arrive_state = state.get() 
-                self.transitions[tuple(self.arr_tupla)] = self.arrive_state
-                print(self.transitions)
-            
-            self.transitionsFrame()
+                #funcion para filtrar elementos que no estan en alfabeto
+                #not_alphabet = notInAlphabetSymbols(pal, alphabet)
+                #print("Palabra no aceptada ya que los simbolos ( "+ not_alphabet+" ) no existen en el alfabeto del AFD")    
+                self.rejectedWindow()
 
+    def constructionAFD(self):
+        self.input_states = [state[0] for state in list(self.transitions.keys())]
+        self.output_states = [state for state in self.transitions.values()]
+        self.alphabet = sorted(set([state[1] for state in list(self.transitions.keys())]))
+        print("Alfabeto\n", self.alphabet)
+        return sorted(set(self.input_states + self.output_states))
+    
+    def WindowConf(self, frame): 
+        frame.grid(column=0, row=0)
+        self.etiq_state.grid(column=0, row=1, columnspan = 1)
+        self.input_state.grid(column=0, row=3, pady = 4)
+        self.boton.grid(column=0, row=9, pady =4) 
+        self.input_state.focus_set()
+    
+    def wordWindow(self, frame):
+        frame.grid(column = 0, row = 0)
+        self.etiq_transition.grid(column=0, row=1, columnspan = 4, pady = 14)
+        self.boxText.grid(column=0, row=2)
+        self.etiq_state.grid(column=0, row=3, columnspan = 4, pady = 14)
+        self.input_state.grid(column=0, row=4, columnspan = 4, pady = 10)
+        self.boton.grid(column=0, row=7, columnspan = 4, pady =10) 
+        self.input_state.focus_set()
+    
+        
     def validTransitions(self):
-        tupla = self.state.get()
-        if tupla:
-            self.arr_tupla = [i.strip() for i in tupla.split(',') if i]
-            if len(self.arr_tupla) != 2 or      self.arr_tupla[0] not in self.states or self.arr_tupla[1] in self.states:
+        trans = self.state
+        if trans.get():
+            self.separate_trans = [elem.strip() for elem in trans.get().split(',') if elem and not(elem.isspace())]
+            
+            if len(self.separate_trans) != 3 or len(self.separate_trans[1]) > 1:
                 messagebox.showerror("Error", "Transición invalida")
                 self.state.set("")
                 self.input_state.focus_set()
     
             else:
-                self.arriveStateFrame()
+                self.actual_state, self.symbol, self.arrive_state = self.separate_trans[0], self.separate_trans[1], self.separate_trans[2]
+                if (self.actual_state, self.symbol) in self.transitions.keys():
+                    askbox = messagebox.askquestion('Reemplazo transición','Estado ya lleva esa transición a otro estado, Desea reemplazarla?',icon = 'warning')
+                    if askbox == 'yes':
+                        self.transitions[(self.actual_state, self.symbol)] = self.arrive_state
+                        print(self.transitions)
+                        
+                else:
+                    self.transitions[(self.actual_state, self.symbol)] = self.arrive_state
+                    print(self.transitions)
                 
+                trans.set("")
+                self.input_state.focus_set()
         else:
-            print("NUEVA VENTANA    ")    
+            self.states = self.constructionAFD()
+            return self.initialStateFrame()    
 
+    
     def finalStatesValid(self):
         state = self.state.get()
         if (state in self.states) and (state not in self.final_states): 
-            self.final_states.append(state)
-            print(self.final_states)
+                self.final_states.append(state)
+                print(self.final_states)
         else:
+                
             if state == '' and len(self.final_states) > 0:
-                return self.transitionsFrame()
+                return self.wordAcceptedFrame()
             
             messagebox.showerror("Error", "Estado final invalido")
         
         self.state.set("")
         self.input_state.focus_set()
 
-    
+
     def initialStateValid(self):
         state = self.state
         if state.get() not in self.states:
@@ -131,31 +196,12 @@ class Window():
             state.set("")
             self.input_state.focus_set()
         
-        
         else:
-            self.initial_state = state.get() 
+            self.initial_state = state.get()
+            state.set("")
+            self.input_state.focus_set()
             self.finalStatesFrame()
             
-        
-
-    
-    def statesValid(self):
-        state = self.state
-        if state.get() and not state.get().isspace():  #Validar ingreso  
-            if state.get() in self.states:
-                messagebox.showerror("Error", "Estado repetido")
-            else:
-                self.states.append(state.get().strip())
-
-            print(self.states)
-        else:
-            self.initialStateFrame() 
-            
-        state.set("")
-        self.input_state.focus_set()
-        if len(self.states) == 0: sys.exit()
-     
-
 def main():
     window = Window()
 

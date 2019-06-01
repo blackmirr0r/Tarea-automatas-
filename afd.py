@@ -34,16 +34,16 @@ if not(trans): sys.exit()
 while trans: 
     separate_trans = [elem.strip() for elem in trans.split(',') if elem and not(elem.isspace())]
     
-    while len(separate_trans) != 3:
+    while len(separate_trans) != 3 or len(separate_trans[1]) > 1:
         print("Transición invalida")
-        trans = input("Ingrese transición de la forma (e_actual, simbolo, e_llegada): ").strip()
-        separate_trans = [elem.strip() for elem in trans.split(',') if elem]
+        trans = input("Ingrese transición de la forma (e_actual, simbolo, separate_trans[1]e_llegada): ").strip()
+        separate_trans = [elem.strip() for elem in trans.split(',') if elem and not(elem.isspace())]
     
     actual_state, symbol, arrive_state = separate_trans[0], separate_trans[1], separate_trans[2]
     if (actual_state, symbol) in transitions.keys():
         option = input("\nEstado ya lleva esa transición a otro estado... Desea reemplazarla? (S | N): ")
         if option in ('S','s'):
-            transitions[(actual_state, symbol)] = arrive_state
+            transitions[(actual_state, symbol)] = arrive_state  
     else:
         transitions[(actual_state, symbol)] = arrive_state
 
@@ -88,6 +88,7 @@ while True:
     flag = True
     pal = input("Ingrese la palabra a revisar: ")
     estado_actual = initial_state 
+    
     #revisa si cada simbolo de la palabra existe en alfabeto
     word_accepted = all(elem in alphabet for elem in set(pal)) 
     
@@ -96,7 +97,7 @@ while True:
     
     else:
         if word_accepted:
-            for index, symbol in enumerate(pal):
+            for symbol in pal:
                 if (estado_actual, symbol) in transitions.keys(): #revisa si existe una transición
                     estado_actual = transitions[(estado_actual, symbol)]
                     
@@ -107,6 +108,7 @@ while True:
         
             if flag and estado_actual in accept_states:
                 print("Palabra aceptada")
+            
             else:
                 print("Palabra no aceptada")
             
