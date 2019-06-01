@@ -64,11 +64,13 @@ class Window():
         self.item1 = StringVar()
         self.item2 = StringVar()
         self.item3 = StringVar()
-        for item in self.transitions.keys(): 
+        self.boxText = [ttk.Label(self.frameWordAccepted,text="")] * len(self.transitions)
+        for index, item in enumerate(self.transitions.keys()): 
             self.item1.set(item[0])
             self.item2.set(item[1])
             self.item3.set(self.transitions[item])
-        self.boxText = ttk.Label(self.frameWordAccepted, text=('δ('+self.item1.get()+','+self.item2.get()+') = '+self.item3.get()))
+            self.boxText[index] = ttk.Label(self.frameWordAccepted, text=('δ('+self.item1.get()+','+self.item2.get()+') = '+self.item3.get()))
+        print(self.boxText) 
         self.etiq_state = ttk.Label(self.frameWordAccepted, text="Ingrese palabra:", font=self.fuente,  style ='color.TLabel')
         self.boton = ttk.Button(self.frameWordAccepted, text="Verificar", command = self.verificateWord)
         self.input_state = ttk.Entry(self.frameWordAccepted, textvariable=self.state, width=30)
@@ -77,9 +79,11 @@ class Window():
     def otherWord1(self):
         self.acceptedFrame.destroy()
         return self.wordAcceptedFrame()
+    
     def otherWord2(self):
         self.rejectedFrame.destroy()
         return self.wordAcceptedFrame()
+    
     def acceptedWindow(self):
         self.frameWordAccepted.destroy()
         self.acceptedFrame = ttk.Frame(self.window, borderwidth=4, padding=(140,120), style ='colorAceptado.TFrame')
@@ -155,7 +159,8 @@ class Window():
     def wordWindow(self, frame):
         frame.grid(column = 0, row = 0)
         self.etiq_transition.grid(column=0, row=1, columnspan = 4, pady = 14)
-        self.boxText.grid(column=0, row=2)
+        for i in range(len(self.boxText)):
+            self.boxText[i].grid(column=i, row=2, padx = 4, pady=14)
         self.etiq_state.grid(column=0, row=3, columnspan = 4, pady = 14)
         self.input_state.grid(column=0, row=4, columnspan = 4, pady = 10)
         self.boton.grid(column=0, row=7, columnspan = 4, pady =10) 
@@ -197,7 +202,7 @@ class Window():
             self.states = self.constructionAFD()
             return self.initialStateFrame()    
 
-    
+     
     def finalStatesValid(self):
         state = self.state.get()
         if (state in self.states) and (state not in self.final_states): 
