@@ -13,17 +13,18 @@ class Window():
         self.transitions = {}
         self.colours =['#A500FD','#101010']
         self.style = ttk.Style()
-        self.style.configure('colorFondo.TFrame', background='#000000')
-        self.style.configure('colorAceptado.TFrame', background='#49F52B', foreground='#FFFFFF')
-        self.style.configure('colorRechazado.TFrame', background='#F41212', foreground='#FFFFFF')  #49F52B
-        self.style.configure('color.TLabel', background='#000000', foreground='#FFFFFF')
-        self.style.configure('labelAceptado.TLabel', background='#49F52B', foreground='#000000')
-        self.style.configure('labelRechazado.TLabel', background='#F41212', foreground='#000000')
+        self.style.configure('colorFondo.TFrame', background='#202020')
+        self.style.configure('colorAceptado.TFrame', background='#0DD400')
+        self.style.configure('colorRechazado.TFrame', background='#F20505')  #49F52B
+        self.style.configure('color.TLabel', background='#202020', foreground='#FFFFFF')
+        self.style.configure('labelAceptado.TLabel', background='#0DD400', foreground='#FFFFFF')
+        self.style.configure('labelRechazado.TLabel', background='#F20505', foreground='#FFFFFF')
         self.window.title("Transiciones")
         self.window.resizable(0,0)
         self.fuente = font.Font(weight='bold')
-        self.frame = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120), style='colorFondo.TFrame')
-        self.etiq_state = ttk.Label(self.frame, text="Ingrese transición de la forma (estado actual, simbolo, estado llegada):", font=self.fuente, padding=(5,5), style='color.TLabel')
+        self.frame = ttk.Frame(self.window, borderwidth=4,padding=(140,120), style='colorFondo.TFrame')
+        self.etiq_state = ttk.Label(self.frame, text="Ingrese transición de la forma: estado, simbolo, estado llegada", font=self.fuente, padding=(5,5), style='color.TLabel')
+        self.etiq_msj = ttk.Label(self.frame, text="( Termina de ingresar dejando texto en blanco )", font='Helvetica', padding=(5,5), style='color.TLabel')
         self.state = StringVar()
         self.input_state = ttk.Entry(self.frame, textvariable=self.state, width=30)
         self.boton = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command = self.validTransitions)
@@ -34,19 +35,21 @@ class Window():
     #Estado inicial
     def initialStateFrame(self):
         self.frame.destroy()
-        self.frameInitialState = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120),style='colorFondo.TFrame' )
+        self.frameInitialState = ttk.Frame(self.window, borderwidth=4, padding=(140,120),style='colorFondo.TFrame' )
         self.etiq_state = ttk.Label(self.frameInitialState, text="Ingrese estado inicial", font=self.fuente, padding=(5,5), style='color.TLabel')
+        self.etiq_msj = ttk.Label(self.frameInitialState, text="", font='Helvetica', padding=(5,5), style='color.TLabel')
         self.boton = ttk.Button(self.frameInitialState, text="Aceptar", padding=(5,5), command = self.initialStateValid)
         self.input_state = ttk.Entry(self.frameInitialState, textvariable=self.state, width=30)
         self.window.title("Estado inicial")
-        self.WindowConf(self.frameInitialState)
+        self.windowConf3(self.frameInitialState)
     
     
     #Estados finales    
     def finalStatesFrame(self):
         self.frameInitialState.destroy()
-        self.frameFinalState = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120), style='colorFondo.TFrame')
+        self.frameFinalState = ttk.Frame(self.window, borderwidth=4, padding=(140,120), style='colorFondo.TFrame')
         self.etiq_state = ttk.Label(self.frameFinalState, text="Ingrese estado final:", font=self.fuente, padding=(5,5), style='color.TLabel')
+        self.etiq_msj = ttk.Label(self.frameFinalState, text="( Termina de ingresar dejando texto en blanco )", font='Helvetica', padding=(5,5), style='color.TLabel')
         self.boton = ttk.Button(self.frameFinalState, text="Aceptar", padding=(5,5), command = self.finalStatesValid)
         self.input_state = ttk.Entry(self.frameFinalState, textvariable=self.state, width=30)
         self.window.title("Estado inicial")
@@ -54,8 +57,9 @@ class Window():
     
     
     def wordAcceptedFrame(self):
+        self.state.set("")
         self.frameFinalState.destroy()
-        self.frameWordAccepted = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120), style='colorFondo.TFrame')
+        self.frameWordAccepted = ttk.Frame(self.window, borderwidth=4, padding=(140,120), style='colorFondo.TFrame')
         self.etiq_transition = ttk.Label(self.frameWordAccepted, text="Transiciones", font=self.fuente, style='color.TLabel')
         self.item1 = StringVar()
         self.item2 = StringVar()
@@ -69,22 +73,35 @@ class Window():
         self.boton = ttk.Button(self.frameWordAccepted, text="Verificar", command = self.verificateWord)
         self.input_state = ttk.Entry(self.frameWordAccepted, textvariable=self.state, width=30)
         self.wordWindow(self.frameWordAccepted)
-
+    
+    def otherWord1(self):
+        self.acceptedFrame.destroy()
+        return self.wordAcceptedFrame()
+    def otherWord2(self):
+        self.rejectedFrame.destroy()
+        return self.wordAcceptedFrame()
     def acceptedWindow(self):
         self.frameWordAccepted.destroy()
-        self.acceptedFrame = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120), style ='colorAceptado.TFrame')
+        self.acceptedFrame = ttk.Frame(self.window, borderwidth=4, padding=(140,120), style ='colorAceptado.TFrame')
         self.etiq_state = ttk.Label(self.acceptedFrame, text="Palabra aceptada!", font=self.fuente, padding=(5,5), style ='labelAceptado.TLabel')
+        self.botonVolver = ttk.Button(self.acceptedFrame, text="Ingresar otra palabra", command = self.otherWord1)
+        self.botonTerminar = ttk.Button(self.acceptedFrame, text="Salir", command = self.window.destroy)
         self.windowConf2(self.acceptedFrame)
     
     def rejectedWindow(self):
         self.frameWordAccepted.destroy()
-        self.rejectedFrame = ttk.Frame(self.window, borderwidth=4,relief="raised", padding=(140,120), style ='colorRechazado.TFrame')
+        self.rejectedFrame = ttk.Frame(self.window, borderwidth=4, padding=(140,120), style ='colorRechazado.TFrame')
         self.etiq_state = ttk.Label(self.rejectedFrame, text="Palabra Rechazada!", font=self.fuente, padding=(5,5), style ='labelRechazado.TLabel')
+        self.botonVolver = ttk.Button(self.rejectedFrame, text="Ingresar otra palabra", command = self.otherWord2)
+        self.botonTerminar = ttk.Button(self.rejectedFrame, text="Salir", command = self.window.destroy)
         self.windowConf2(self.rejectedFrame)
     
     def windowConf2(self, frame):
         frame.grid(column=0, row=0)
         self.etiq_state.grid(column=0, row=1, columnspan = 1)
+        self.botonVolver.grid(column=0, row=4, columnspan = 1)
+        self.botonTerminar.grid(column=2, row=4, columnspan = 1)
+        
         
     def verificateWord(self):
         self.flag = True
@@ -131,6 +148,7 @@ class Window():
         frame.grid(column=0, row=0)
         self.etiq_state.grid(column=0, row=1, columnspan = 1)
         self.input_state.grid(column=0, row=3, pady = 4)
+        self.etiq_msj.grid(column=0, row=2, pady = 4)
         self.boton.grid(column=0, row=9, pady =4) 
         self.input_state.focus_set()
     
@@ -143,9 +161,16 @@ class Window():
         self.boton.grid(column=0, row=7, columnspan = 4, pady =10) 
         self.input_state.focus_set()
     
-        
+    def windowConf3(self, frame):
+        frame.grid(column=0, row=0)
+        self.etiq_state.grid(column=0, row=1, columnspan = 1)
+        self.input_state.grid(column=0, row=3, pady = 4)
+        self.boton.grid(column=0, row=9, pady =4) 
+        self.input_state.focus_set()
+    
     def validTransitions(self):
         trans = self.state
+        if not(trans.get()) and len(self.transitions) == 0: sys.exit() 
         if trans.get():
             self.separate_trans = [elem.strip() for elem in trans.get().split(',') if elem and not(elem.isspace())]
             
@@ -183,8 +208,14 @@ class Window():
             if state == '' and len(self.final_states) > 0:
                 return self.wordAcceptedFrame()
             
-            messagebox.showerror("Error", "Estado final invalido")
-        
+            elif len(state) != 0:
+                messagebox.showerror("Error", "Estado final invalido")
+            
+            else:
+                messagebox.showerror("Error", "Debe ingresar al menos un estado final")
+            
+            
+            
         self.state.set("")
         self.input_state.focus_set()
 
@@ -192,7 +223,10 @@ class Window():
     def initialStateValid(self):
         state = self.state
         if state.get() not in self.states:
-            messagebox.showerror("Error", "Estado inicial invalido")
+            if state.get() != '':
+                messagebox.showerror("Error", "Estado inicial invalido")
+            else:
+                messagebox.showerror("Error", "Debe ingresar al menos un estado inicial")
             state.set("")
             self.input_state.focus_set()
         
