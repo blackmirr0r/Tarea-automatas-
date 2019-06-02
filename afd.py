@@ -1,6 +1,6 @@
 import sys 
 
-
+# Función validadora de estados finales 
 def acceptStatesValid(states, s):
     accept = []
     entr = input(s).strip()
@@ -17,59 +17,49 @@ def acceptStatesValid(states, s):
         entr = input(s).strip()
 
 
-def notInAlphabetSymbols(pal, alphabet):
-    pal = sorted(set("".join(pal)))
-    not_in_alphabet = [symbol for symbol in pal if symbol not in alphabet]
-    return " - ".join(not_in_alphabet)
-
-###############################################
-#           Ingreso transiciones
-###############################################
-
+# Inicio del programa ingresando transiciones de la forma: estado, simbolo, estado de llegada
 transitions = {} 
 
-trans = input("Ingrese transición de la forma (e_actual, simbolo, e_llegada): ").strip()
-if not(trans): sys.exit()
+trans = input("Ingrese transición de la forma: estado, simbolo, estado llegada\n >> ").strip()
+if not(trans): sys.exit() # Si usuario no ingresa nada entonces el programa acaba 
 
+#Si usuario ingresa una transicion se analiza si ésta es valida y se guarda en diccionario
 while trans: 
     separate_trans = [elem.strip() for elem in trans.split(',') if elem and not(elem.isspace())]
     
     while len(separate_trans) != 3 or len(separate_trans[1]) > 1:
         print("Transición invalida")
-        trans = input("Ingrese transición de la forma (e_actual, simbolo, separate_trans[1]e_llegada): ").strip()
+        trans = input("\nIngrese transición de la forma: estado, simbolo, estado llegada\n >> ").strip()
         separate_trans = [elem.strip() for elem in trans.split(',') if elem and not(elem.isspace())]
     
     actual_state, symbol, arrive_state = separate_trans[0], separate_trans[1], separate_trans[2]
+    #Para validar que Autómata no sea AFND se analiza si estado,simbolo ya se encuentra almacenado
     if (actual_state, symbol) in transitions.keys():
+        
+        #Si este está se pregunta si desea reemplazarlo o desea dejarlo como está 
         option = input("\nEstado ya lleva esa transición a otro estado... Desea reemplazarla? (S | N): ")
         if option in ('S','s'):
             transitions[(actual_state, symbol)] = arrive_state  
     else:
         transitions[(actual_state, symbol)] = arrive_state
 
-    
-    print(transitions)
-    trans = input("Ingrese transición de la forma (e_actual, simbolo, e_llegada): ").strip()
+    print('\n',transitions, '\n')
+    trans = input("\nIngrese transición de la forma: estado, simbolo, estado llegada\n >> ").strip()
     
 
-###############################################
-#           Recolección de datos
-###############################################
+#Se realiza la recolección de datos 
 
 input_states = [state[0] for state in list(transitions.keys())]
-
 output_states = [state for state in transitions.values()]
-
+# Se guarda el alfabeto con cada simbolo ingresado con la 2da posición de cada transición 
 alphabet = sorted(set([state[1] for state in list(transitions.keys())]))
-print("Alfabeto\n", alphabet)
 
+#Se guardan estados juntando estado de entrada y estados de llegada ya que 
+#Si en algun caso un estado esta aislado de los demas o no tiene estados de llegada 
 states = sorted(set(input_states + output_states))
-print("Estados\n", states)
 
-###############################################
-#           Estado inicial y Estados finales 
-###############################################
-print("----------------------------------------------------\n")
+
+#Ingreso de estado inicial
 initial_state = input("\nIngrese estado inicial: ")
 
 while initial_state not in states:
@@ -77,13 +67,8 @@ while initial_state not in states:
     initial_state = input("\nIngrese estado inicial: ")
 
 accept_states = acceptStatesValid(states, "Ingrese estado final (Termina si no ingresa nada): ")
-print(initial_state)
-print(accept_states)
 
-###############################################
-#          Verificación de aceptación AFD 
-###############################################
-
+#Ingreso de palabra y se analiza si ésta es aceptada o rechazada 
 while True:
     flag = True
     pal = input("Ingrese la palabra a revisar: ")
@@ -92,13 +77,15 @@ while True:
     #revisa si cada simbolo de la palabra existe en alfabeto
     word_accepted = all(elem in alphabet for elem in set(pal)) 
     
+    #Si se ingresa la palabra vacía se analiza si está o no en estado aceptado
     if not(pal):
         print("Palabra aceptada") if estado_actual in accept_states else print("Palabra no aceptada")
     
     else:
         if word_accepted:
             for symbol in pal:
-                if (estado_actual, symbol) in transitions.keys(): #revisa si existe una transición
+                #revisa si existe una transición
+                if (estado_actual, symbol) in transitions.keys(): 
                     estado_actual = transitions[(estado_actual, symbol)]
                     
                 else:
@@ -113,6 +100,5 @@ while True:
                 print("Palabra no aceptada")
             
         else:
-            #funcion para filtrar elementos que no estan en alfabeto
-            not_alphabet = notInAlphabetSymbols(pal, alphabet)
-            print("Palabra no aceptada ya que los simbolos ( "+ not_alphabet+" ) no existen en el alfabeto del AFD")    
+           
+            print("Palabra no aceptada")    
