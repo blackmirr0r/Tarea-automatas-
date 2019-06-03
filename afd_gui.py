@@ -22,6 +22,10 @@ class Window():
         self.window.title("Transiciones")
         self.window.resizable(0,0)
         self.fuente = font.Font(weight='bold')
+        self.transitionsFrame()
+        self.window.mainloop()
+
+    def transitionsFrame(self):
         self.frame = ttk.Frame(self.window, borderwidth=4,padding=(140,120), style='colorFondo.TFrame')
         self.etiq_state = ttk.Label(self.frame, text="Ingrese transición de la forma: estado, simbolo, estado llegada", font=self.fuente, padding=(5,5), style='color.TLabel')
         self.etiq_msj = ttk.Label(self.frame, text="( Termina de ingresar dejando texto en blanco )", font='Helvetica', padding=(5,5), style='color.TLabel')
@@ -29,9 +33,7 @@ class Window():
         self.input_state = ttk.Entry(self.frame, textvariable=self.state, width=30)
         self.boton = ttk.Button(self.frame, text="Aceptar", padding=(5,5), command = self.validTransitions)
         self.WindowConf(self.frame)
-        self.window.mainloop()
-
-    
+        
     #Estado inicial
     def initialStateFrame(self):
         self.frame.destroy()
@@ -154,7 +156,6 @@ class Window():
         self.input_states = [state[0] for state in list(self.transitions.keys())]
         self.output_states = [state for state in self.transitions.values()]
         self.alphabet = sorted(set([state[1] for state in list(self.transitions.keys())]))
-        print("Alfabeto\n", self.alphabet)
         return sorted(set(self.input_states + self.output_states))
     
     def WindowConf(self, frame): 
@@ -184,7 +185,12 @@ class Window():
     
     def validTransitions(self):
         trans = self.state
-        if not(trans.get()) and len(self.transitions) == 0: sys.exit() 
+        if not(trans.get()) and len(self.transitions) == 0:
+            askbox = messagebox.askquestion('','No ingresó transiciones, desea salir?',icon = 'warning')
+            if askbox == 'yes':
+                sys.exit()
+            else:
+                return self.transitionsFrame()        
         if trans.get():
             self.separate_trans = [elem.strip() for elem in trans.get().split(',') if elem and not(elem.isspace())]
             
@@ -199,11 +205,11 @@ class Window():
                     askbox = messagebox.askquestion('Reemplazo transición','Estado ya lleva esa transición a otro estado, Desea reemplazarla?',icon = 'warning')
                     if askbox == 'yes':
                         self.transitions[(self.actual_state, self.symbol)] = self.arrive_state
-                        print(self.transitions)
+                    
                         
                 else:
                     self.transitions[(self.actual_state, self.symbol)] = self.arrive_state
-                    print(self.transitions)
+                    
                 
                 trans.set("")
                 self.input_state.focus_set()
@@ -216,7 +222,7 @@ class Window():
         state = self.state.get()
         if (state in self.states) and (state not in self.final_states): 
                 self.final_states.append(state)
-                print(self.final_states)
+                
         else:
                 
             if state == '' and len(self.final_states) > 0:
@@ -240,7 +246,7 @@ class Window():
             if state.get() != '':
                 messagebox.showerror("Error", "Estado inicial invalido")
             else:
-                messagebox.showerror("Error", "Debe ingresar al menos un estado inicial")
+                messagebox.showerror("Error", "Debe ingresar un estado inicial")
             state.set("")
             self.input_state.focus_set()
         

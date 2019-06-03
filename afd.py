@@ -17,13 +17,22 @@ def acceptStatesValid(states, s):
         entr = input(s).strip()
 
 
-# Inicio del programa ingresando transiciones de la forma: estado, simbolo, estado de llegada
+def showTransitions(transitions):
+    for trans in transitions.keys():
+        print('d('+trans[0]+','+trans[1]+') = '+transitions[trans])
+        
+
+#Diccionario que almacena transiciones
 transitions = {} 
 
 trans = input("Ingrese transición de la forma: estado, simbolo, estado llegada\n >> ").strip()
-if not(trans): sys.exit() # Si usuario no ingresa nada entonces el programa acaba 
+if not(trans):
+    exit = input("No ingresó transiciones, Desea salir? (S / n)") # Si usuario no ingresa nada entonces el programa acaba 
+    if exit in ('S', 's'): sys.exit()
+    else:
+        trans = input("Ingrese transición de la forma: estado, simbolo, estado llegada\n >> ").strip()
+        
 
-#Si usuario ingresa una transicion se analiza si ésta es valida y se guarda en diccionario
 while trans: 
     separate_trans = [elem.strip() for elem in trans.split(',') if elem and not(elem.isspace())]
     
@@ -33,40 +42,39 @@ while trans:
         separate_trans = [elem.strip() for elem in trans.split(',') if elem and not(elem.isspace())]
     
     actual_state, symbol, arrive_state = separate_trans[0], separate_trans[1], separate_trans[2]
-    #Para validar que Autómata no sea AFND se analiza si estado,simbolo ya se encuentra almacenado
+    #Para validar que Autómata no sea AFND
     if (actual_state, symbol) in transitions.keys():
         
-        #Si este está se pregunta si desea reemplazarlo o desea dejarlo como está 
         option = input("\nEstado ya lleva esa transición a otro estado... Desea reemplazarla? (S | N): ")
         if option in ('S','s'):
             transitions[(actual_state, symbol)] = arrive_state  
+
     else:
         transitions[(actual_state, symbol)] = arrive_state
 
-    print('\n',transitions, '\n')
     trans = input("\nIngrese transición de la forma: estado, simbolo, estado llegada\n >> ").strip()
     
 
-#Se realiza la recolección de datos 
-
+#Estados 
 input_states = [state[0] for state in list(transitions.keys())]
 output_states = [state for state in transitions.values()]
-# Se guarda el alfabeto con cada simbolo ingresado con la 2da posición de cada transición 
-alphabet = sorted(set([state[1] for state in list(transitions.keys())]))
+states = list(set(input_states + output_states))
 
-#Se guardan estados juntando estado de entrada y estados de llegada ya que 
-#Si en algun caso un estado esta aislado de los demas o no tiene estados de llegada 
-states = sorted(set(input_states + output_states))
+#Alfabeto
+alphabet = list(set([state[1] for state in list(transitions.keys())]))
 
-
-#Ingreso de estado inicial
 initial_state = input("\nIngrese estado inicial: ")
 
 while initial_state not in states:
     print("Estado inicial invalido")
     initial_state = input("\nIngrese estado inicial: ")
 
+
+#Estados finales
 accept_states = acceptStatesValid(states, "Ingrese estado final (Termina si no ingresa nada): ")
+
+
+showTransitions(transitions)
 
 #Ingreso de palabra y se analiza si ésta es aceptada o rechazada 
 while True:
@@ -77,14 +85,12 @@ while True:
     #revisa si cada simbolo de la palabra existe en alfabeto
     word_accepted = all(elem in alphabet for elem in set(pal)) 
     
-    #Si se ingresa la palabra vacía se analiza si está o no en estado aceptado
     if not(pal):
         print("Palabra aceptada") if estado_actual in accept_states else print("Palabra no aceptada")
     
     else:
         if word_accepted:
             for symbol in pal:
-                #revisa si existe una transición
                 if (estado_actual, symbol) in transitions.keys(): 
                     estado_actual = transitions[(estado_actual, symbol)]
                     
